@@ -21,26 +21,34 @@ public class PersonService {
         String token = UUID.randomUUID().toString();
         String salt = PasswordUtils.generateSalt(512).get();
 
-        Person person = new Person(token, name, hashPassword(password, salt).get());
-        Salt saltToSave = new Salt(token, salt);
+        PersonEntity personEntity = new PersonEntity(token, name, hashPassword(password, salt));
+        SaltEntity saltEntityToSave = new SaltEntity(token, salt);
 
-        personRepository.save(person);
-        saltRepository.save(saltToSave);
-        return person.getToken();
+        personRepository.save(personEntity);
+        saltRepository.save(saltEntityToSave);
+        return personEntity.getToken();
     }
 
-    public boolean verifyLogIn(String name, String password, String token) {
+    public String verifyLogIn(String name, String password, String token) throws UseException {
         String salt = saltRepository.getById(token).getSalt();
+        String hashedPasswordToVerify = hashPassword(password, salt);
 
-        String hashedPasswordToCheck = hashPassword(password, salt).get();
-        Optional<Person> personToVerify = personRepository.findAll().stream()
-                .filter(person -> person.getName().equals(name)
-                        && person.getPassword().equals(hashedPasswordToCheck)
-                        && person.getToken().equals(token)).findFirst();
-        return personToVerify.isPresent();
+        PersonEntity personEntityToVerify = personRepository.findById(token)
+                .orElseThrow(() -> new UseException(Activity.VERIFY_PERSON, UseExceptionType.PERSON_NOT_FOUND));
+
+        if (personEntityToVerify.getName().equals(name) && !personEntityToVerify.getPassword().equals(hashedPasswordToVerify)) {
+            throw new UseException(Activity.VERIFY_PERSON, UseExceptionType.WRONG_PASSWORD);
+        }
+        return personEntityToVerify.getToken();
     }
 
-    Optional<String> hashPassword(String password, String salt) {
-        return PasswordUtils.hashPassword(password, salt);
+   String hashPassword(String password, String salt) {
+        return PasswordUtils.hashPassword(password, salt).get();
+    }
+
+    public boolean verifyToken(String token){
+        personRepository.getById(token);
+        return false;
+
     }
 }

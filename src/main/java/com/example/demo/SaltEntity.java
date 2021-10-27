@@ -14,13 +14,11 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table
-public class Person {
+public class SaltEntity {
     @Id
     String token;
-    @Column
-    String name;
-    @Column
-    String password;
 
+    @Column(length=1000)
+    String salt;
 
 }

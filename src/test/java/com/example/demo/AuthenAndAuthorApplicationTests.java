@@ -30,24 +30,28 @@ class AuthenAndAuthorApplicationTests {
     }
 
     @Test
-    void verifyLogInSuccess() {
+    void verifyLogInSuccess() throws UseException {
         //Given
         String annaToken = personService.createPerson("anna", "losen");
         String beritToken = personService.createPerson("berit", "123456");
         String kalleToken = personService.createPerson("kalle", "password");
 
         //When
-        boolean anna = personService.verifyLogIn("anna", "losen", annaToken);
-        boolean berit = personService.verifyLogIn("berit", "123456", beritToken);
-        boolean kalle = personService.verifyLogIn("kalle", "password", kalleToken);
-        Person annaPerson = personRepository.getById(annaToken);
+        String anna = personService.verifyLogIn("anna", "losen", annaToken);
+        String berit = personService.verifyLogIn("berit", "123456", beritToken);
+        String kalle = personService.verifyLogIn("kalle", "password", kalleToken);
 
         //Then
-        assertTrue(anna);
-        assertTrue(berit);
-        assertTrue(kalle);
-        assertNotEquals("losen", annaPerson.getPassword());
+        assertEquals(annaToken,anna);
+        assertEquals(beritToken,berit);
+        assertEquals(kalleToken,kalle);
     }
+/*
+
+    UseException annaException = assertThrows(UseException.class, () -> {
+        String anna = personService.verifyLogIn("anna", "losen", annaToken);
+    });
+*/
 
 
 }
