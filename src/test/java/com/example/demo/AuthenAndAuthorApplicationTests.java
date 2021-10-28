@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -30,6 +31,11 @@ class AuthenAndAuthorApplicationTests {
         annaToken = personService.createPerson("anna", "losen");
         beritToken = personService.createPerson("berit", "123456");
         kalleToken = personService.createPerson("kalle", "password");
+
+        personService.addResourceAndRights(annaToken, Resource.ACCOUNT, Rights.READ);
+        personService.addResourceAndRights(beritToken, Resource.ACCOUNT, Rights.READ);
+        personService.addResourceAndRights(beritToken, Resource.ACCOUNT, Rights.WRITE);
+        personService.addResourceAndRights(kalleToken, Resource.PROVISION_CALC, Rights.EXECUTE);
     }
 
     @AfterEach
@@ -93,6 +99,7 @@ class AuthenAndAuthorApplicationTests {
         assertTrue(berit);
         assertTrue(kalle);
     }
+
     @Test
     void verifyTokenIsValidFail() {
         //When
@@ -105,4 +112,26 @@ class AuthenAndAuthorApplicationTests {
         assertFalse(berit);
         assertFalse(kalle);
     }
+
+    @Test
+    void verifyResourcesSuccess() {
+        //Given
+        personService.addResourceAndRights(annaToken, Resource.ACCOUNT, Rights.READ);
+        personService.addResourceAndRights(beritToken, Resource.ACCOUNT, Rights.READ);
+        personService.addResourceAndRights(beritToken, Resource.ACCOUNT, Rights.WRITE);
+        personService.addResourceAndRights(kalleToken, Resource.PROVISION_CALC, Rights.EXECUTE);
+
+        //When
+        List<Rights> annasRights = personService.getRightsForResourceByToken(annaToken, Resource.ACCOUNT);
+        List<Rights> beritsRights = personService.getRightsForResourceByToken(beritToken, Resource.ACCOUNT);
+        List<Rights> kalleRights = personService.getRightsForResourceByToken(kalleToken, Resource.PROVISION_CALC);
+
+        //Then
+        assertThat(List.of(Rights.READ), annasRights);
+        assertThat(List.of(Rights.READ ,Rights.WRITE), annasRights);
+        assertThat(List.of(Rights.EXECUTE), kalleRights);
+
+    }
+
+
 }
