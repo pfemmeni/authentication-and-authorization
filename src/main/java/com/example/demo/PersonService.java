@@ -5,8 +5,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class PersonService {
@@ -30,25 +32,34 @@ public class PersonService {
     }
 
     public String verifyLogIn(String name, String password, String token) throws UseException {
-        String salt = saltRepository.getById(token).getSalt();
-        String hashedPasswordToVerify = hashPassword(password, salt);
-
         PersonEntity personEntityToVerify = personRepository.findById(token)
                 .orElseThrow(() -> new UseException(Activity.VERIFY_PERSON, UseExceptionType.PERSON_NOT_FOUND));
 
+        String salt = saltRepository.getById(token).getSalt();
+        String hashedPasswordToVerify = hashPassword(password, salt);
+
+
         if (personEntityToVerify.getName().equals(name) && !personEntityToVerify.getPassword().equals(hashedPasswordToVerify)) {
-            throw new UseException(Activity.VERIFY_PERSON, UseExceptionType.WRONG_PASSWORD);
+            throw new UseException(Activity.VERIFY_PASSWORD, UseExceptionType.WRONG_PASSWORD);
+        }
+        if (!personEntityToVerify.getName().equals(name) && personEntityToVerify.getPassword().equals(hashedPasswordToVerify)) {
+            throw new UseException(Activity.VERIFY_USERNAME, UseExceptionType.WRONG_USERNAME);
         }
         return personEntityToVerify.getToken();
     }
 
-   String hashPassword(String password, String salt) {
+    String hashPassword(String password, String salt) {
         return PasswordUtils.hashPassword(password, salt).get();
     }
 
-    public boolean verifyToken(String token){
-        personRepository.getById(token);
-        return false;
+    public boolean verifyToken(String token) {
+        List<PersonEntity> persons = personRepository.findAll().stream()
+                .filter(person -> person.getToken().equals(token))
+                .collect(Collectors.toList());
+        if (persons.size() == 0) {
+            return false;
+        }
+        return true;
 
     }
 }
