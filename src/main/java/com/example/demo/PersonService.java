@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -16,6 +15,8 @@ public class PersonService {
     PersonRepository personRepository;
     @Autowired
     SaltRepository saltRepository;
+    @Autowired
+    ResourceRepository resourceRepository;
 
     private static final Logger log = LoggerFactory.getLogger(PersonService.class);
 
@@ -60,5 +61,18 @@ public class PersonService {
             return false;
         }
         return true;
+    }
+
+    public void addResourceAndRights(String token, Resource resource, Rights rights){
+        PersonEntity person = personRepository.getById(token);
+        Resources resources = new Resources(UUID.randomUUID().toString(), resource,rights);
+        resourceRepository.save(resources);
+        person.addResouces(resources);
+        personRepository.save(person);
+    }
+
+    public List<Rights> getRightsForResourceByToken(String token, Resource resource) throws UseException {
+        return personRepository.getById(token).getRightsForResource(resource);
+
     }
 }

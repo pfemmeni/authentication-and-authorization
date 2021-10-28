@@ -32,10 +32,6 @@ class AuthenAndAuthorApplicationTests {
         beritToken = personService.createPerson("berit", "123456");
         kalleToken = personService.createPerson("kalle", "password");
 
-        personService.addResourceAndRights(annaToken, Resource.ACCOUNT, Rights.READ);
-        personService.addResourceAndRights(beritToken, Resource.ACCOUNT, Rights.READ);
-        personService.addResourceAndRights(beritToken, Resource.ACCOUNT, Rights.WRITE);
-        personService.addResourceAndRights(kalleToken, Resource.PROVISION_CALC, Rights.EXECUTE);
     }
 
     @AfterEach
@@ -114,7 +110,7 @@ class AuthenAndAuthorApplicationTests {
     }
 
     @Test
-    void verifyResourcesSuccess() {
+    void verifyResourcesSuccess() throws UseException {
         //Given
         personService.addResourceAndRights(annaToken, Resource.ACCOUNT, Rights.READ);
         personService.addResourceAndRights(beritToken, Resource.ACCOUNT, Rights.READ);
@@ -127,11 +123,31 @@ class AuthenAndAuthorApplicationTests {
         List<Rights> kalleRights = personService.getRightsForResourceByToken(kalleToken, Resource.PROVISION_CALC);
 
         //Then
-        assertThat(List.of(Rights.READ), annasRights);
-        assertThat(List.of(Rights.READ ,Rights.WRITE), annasRights);
-        assertThat(List.of(Rights.EXECUTE), kalleRights);
-
+        assertEquals(List.of(Rights.READ), annasRights);
+        assertEquals(List.of(Rights.READ ,Rights.WRITE), beritsRights);
+        assertEquals(List.of(Rights.EXECUTE), kalleRights);
     }
+    @Test
+    void verifyResourcesFail() throws UseException {
+        //Given
+        personService.addResourceAndRights(beritToken, Resource.ACCOUNT, Rights.READ);
+        personService.addResourceAndRights(beritToken, Resource.ACCOUNT, Rights.WRITE);
+
+
+        //When
+        UseException beritException = assertThrows(UseException.class, () -> {
+       personService.getRightsForResourceByToken(beritToken, Resource.PROVISION_CALC);
+        });
+        UseException kalleException = assertThrows(UseException.class, () -> {
+             personService.getRightsForResourceByToken(kalleToken, Resource.PROVISION_CALC);
+        });
+
+
+        //Then
+        assertEquals(Activity.VERIFY_RIGHTS, beritException.getActivity());
+        assertEquals(UseExceptionType.RESOURCE_NOT_FOUND, kalleException.getUserExceptionType());
+    }
+
 
 
 }
