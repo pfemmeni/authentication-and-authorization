@@ -1,7 +1,5 @@
 package com.example.demo;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +16,6 @@ public class PersonService {
     @Autowired
     ResourceRepository resourceRepository;
 
-    private static final Logger log = LoggerFactory.getLogger(PersonService.class);
 
     public PersonEntity createPerson(String name, String password) {
         String token = UUID.randomUUID().toString();
@@ -63,9 +60,9 @@ public class PersonService {
         return true;
     }
 
-    public void addResourceAndRights(String token, Resource resource, Rights rights){
+    public void addResourceAndRights(String token, Resource resource, Rights rights) {
         PersonEntity person = personRepository.getById(token);
-        Resources resources = new Resources(UUID.randomUUID().toString(), resource,rights);
+        Resources resources = new Resources(UUID.randomUUID().toString(), resource, rights);
         resourceRepository.save(resources);
         person.addResouces(resources);
         personRepository.save(person);
