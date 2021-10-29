@@ -20,7 +20,7 @@ public class PersonService {
 
     private static final Logger log = LoggerFactory.getLogger(PersonService.class);
 
-    public String createPerson(String name, String password) {
+    public PersonEntity createPerson(String name, String password) {
         String token = UUID.randomUUID().toString();
         String salt = PasswordUtils.generateSalt(512).get();
 
@@ -29,7 +29,7 @@ public class PersonService {
 
         personRepository.save(personEntity);
         saltRepository.save(saltEntityToSave);
-        return personEntity.getToken();
+        return personEntity;
     }
 
     public String verifyLogIn(String name, String password, String token) throws UseException {
