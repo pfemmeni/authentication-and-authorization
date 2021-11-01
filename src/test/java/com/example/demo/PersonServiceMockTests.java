@@ -52,11 +52,6 @@ class PersonServiceMockTests {
 
     }
 
-    /*@AfterEach
-    void tearDown() {
-        personRepository.deleteAll();
-    }
-*/
     @Test
     void createPerson() {
 
