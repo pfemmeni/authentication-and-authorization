@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +24,7 @@ class PersonServiceMockTests {
     @Autowired
     PersonService personService;
 
-
+    @MockBean
     PersonRepository personRepository;
 
     String annaToken;
@@ -36,7 +37,6 @@ class PersonServiceMockTests {
 
     @BeforeEach
     void setUp() {
-        personRepository = mock(PersonRepository.class);
         when(personRepository.save(anyObject())).then(invocationOnMock -> invocationOnMock.getArgument(0));
         anna = personService.createPerson("anna", "losen");
         berit = personService.createPerson("berit", "123456");
@@ -67,7 +67,7 @@ class PersonServiceMockTests {
 
     @Test
     void verifyLogInSuccess() throws UseException {
-       //Given
+        //Given
         when(personRepository.findById(annaToken)).thenReturn(Optional.ofNullable(anna));
         when(personRepository.findById(beritToken)).thenReturn(Optional.ofNullable(berit));
         when(personRepository.findById(kalleToken)).thenReturn(Optional.ofNullable(kalle));
