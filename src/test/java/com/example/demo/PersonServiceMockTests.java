@@ -1,7 +1,11 @@
 package com.example.demo;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -14,7 +18,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyObject;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -24,7 +27,7 @@ class PersonServiceMockTests {
     @Autowired
     PersonService personService;
 
-    @MockBean
+    @Mock
     PersonRepository personRepository;
 
     String annaToken;
@@ -37,26 +40,27 @@ class PersonServiceMockTests {
 
     @BeforeEach
     void setUp() {
+
         when(personRepository.save(anyObject())).then(invocationOnMock -> invocationOnMock.getArgument(0));
         anna = personService.createPerson("anna", "losen");
         berit = personService.createPerson("berit", "123456");
         kalle = personService.createPerson("kalle", "password");
+
         annaToken = anna.getToken();
         beritToken = berit.getToken();
         kalleToken = kalle.getToken();
+
     }
 
     /*@AfterEach
     void tearDown() {
-        when(personRepository.deleteAll()).;
-    }*/
-
+        personRepository.deleteAll();
+    }
+*/
     @Test
     void createPerson() {
-        //Given
+
         when(personRepository.findAll()).thenReturn(List.of(anna, kalle, berit));
-
-
         //Then
         assertEquals(3, personRepository.findAll().size());
         assertNotNull(annaToken);
