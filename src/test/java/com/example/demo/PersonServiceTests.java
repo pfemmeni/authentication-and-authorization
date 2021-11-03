@@ -20,9 +20,12 @@ class PersonServiceTests {
 
     @Autowired
     PersonService personService;
-
     @Autowired
     PersonRepository personRepository;
+    @Autowired
+    SaltRepository saltRepository;
+    @Autowired
+    ResourceRepository resourceRepository;
 
     String annaToken;
     String beritToken;

@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,13 +25,14 @@ public class PersonEntity {
     String name;
     @Column
     String password;
+
     @OneToMany
     @Column
-    List<Resources> resources;
+    List<Resources> resources = new ArrayList<>();
 
 
     @ElementCollection
-    List<Rights> rightsList;
+    List<Rights> rightsList = new ArrayList<>();
 
     private static final Logger log = LoggerFactory.getLogger(PersonService.class);
 
@@ -42,6 +44,13 @@ public class PersonEntity {
         this.token = token;
         this.name = name;
         this.password = password;
+    }
+
+    public PersonEntity(String token, String name, String password, List<Resources> resources) {
+        this.token = token;
+        this.name = name;
+        this.password = password;
+        this.resources = resources;
     }
 
     public List<Rights> getRightsForResource(Resource resource) throws UseException {

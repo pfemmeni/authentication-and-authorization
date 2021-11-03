@@ -1,5 +1,7 @@
 package com.example.demo;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -8,12 +10,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class PersonService {
-    @Autowired
     PersonRepository personRepository;
-    @Autowired
     SaltRepository saltRepository;
-    @Autowired
     ResourceRepository resourceRepository;
 
 
@@ -23,9 +23,9 @@ public class PersonService {
 
         PersonEntity personEntity = new PersonEntity(token, name, hashPassword(password, salt));
         SaltEntity saltEntityToSave = new SaltEntity(token, salt);
-
-        personRepository.save(personEntity);
         saltRepository.save(saltEntityToSave);
+        personRepository.save(personEntity);
+
         return personEntity;
     }
 
@@ -60,12 +60,16 @@ public class PersonService {
         return true;
     }
 
-    public void addResourceAndRights(String token, Resource resource, Rights rights) {
+    public PersonEntity addResourceAndRights(String token,
+                                             Resource resource,
+                                             Rights rights) {
         PersonEntity person = personRepository.getById(token);
-        Resources resources = new Resources(UUID.randomUUID().toString(), resource, rights);
+        Resources resources = new Resources(UUID.randomUUID().toString(),
+                resource,
+                rights);
         resourceRepository.save(resources);
         person.addResouces(resources);
-        personRepository.save(person);
+        return personRepository.save(person);
     }
 
     public List<Rights> getRightsForResourceByToken(String token, Resource resource) throws UseException {
