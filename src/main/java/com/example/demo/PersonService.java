@@ -17,8 +17,7 @@ public class PersonService {
     ResourceRepository resourceRepository;
 
 
-    public PersonEntity createPerson(String name, String password) {
-        String token = UUID.randomUUID().toString();
+    public PersonEntity createPerson(String name, String password, String token) {
         String salt = PasswordUtils.generateSalt(512).get();
 
         PersonEntity personEntity = new PersonEntity(token, name, hashPassword(password, salt));

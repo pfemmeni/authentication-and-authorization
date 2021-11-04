@@ -33,9 +33,9 @@ class PersonServiceTests {
 
     @BeforeEach
     void setUp() {
-        annaToken = personService.createPerson("anna", "losen").getToken();
-        beritToken = personService.createPerson("berit", "123456").getToken();
-        kalleToken = personService.createPerson("kalle", "password").getToken();
+        annaToken = personService.createPerson("anna", "losen", UUID.randomUUID().toString()).getToken();
+        beritToken = personService.createPerson("berit", "123456", UUID.randomUUID().toString()).getToken();
+        kalleToken = personService.createPerson("kalle", "password", UUID.randomUUID().toString()).getToken();
 
     }
 
